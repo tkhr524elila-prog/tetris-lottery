@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>テトリミノカード抽選</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --line: #d9dfeb;
+      --text: #1f2937;
+      --muted: #6b7280;
+
+      --i: #22d3ee;
+      --o: #facc15;
+      --t: #c084fc;
+      --s: #4ade80;
+      --z: #f87171;
+      --j: #60a5fa;
+      --l: #fb923c;
+
+      --heart: #ef4444;
+      --joker: #111827;
+
+      --card-back-1: #1d4ed8;
+      --card-back-2: #1e40af;
+      --card-back-line: rgba(255,255,255,0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .lead {
+      margin: 0 0 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card-panel,
+    .board {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .toggle {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 8px;
+      min-height: 46px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .toggle.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-height: 44px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .note {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .status {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      min-height: 52px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .summary-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill strong {
+      color: var(--text);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .game-card {
+      aspect-ratio: 3 / 4.2;
+      perspective: 1000px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .game-card.disabled {
+      cursor: default;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.48s ease;
+      transform-style: preserve-3d;
+    }
+
+    .game-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, var(--card-back-1), var(--card-back-2));
+      display: grid;
+      place-items: center;
+      color: #fff;
+    }
+
+    .card-back::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 14px;
+      border: 2px solid var(--card-back-line);
+    }
+
+    .card-back-mark {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      z-index: 1;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .card-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .card-symbol {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .card-mini {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .piece-preview {
+      display: inline-grid;
+      gap: 3px;
+      padding: 8px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+    }
+
+    .piece-row {
+      display: flex;
+      gap: 3px;
+    }
+
+    .piece-cell {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: #e5e7eb;
+      border: 1px solid #d1d5db;
+    }
+
+    .piece-cell.fill.i { background: var(--i); border-color: var(--i); }
+    .piece-cell.fill.o { background: var(--o); border-color: var(--o); }
+    .piece-cell.fill.t { background: var(--t); border-color: var(--t); }
+    .piece-cell.fill.s { background: var(--s); border-color: var(--s); }
+    .piece-cell.fill.z { background: var(--z); border-color: var(--z); }
+    .piece-cell.fill.j { background: var(--j); border-color: var(--j); }
+    .piece-cell.fill.l { background: var(--l); border-color: var(--l); }
+
+    .front-i .card-symbol, .front-i .card-mini { color: var(--i); }
+    .front-o .card-symbol, .front-o .card-mini { color: #b45309; }
+    .front-t .card-symbol, .front-t .card-mini { color: #7c3aed; }
+    .front-s .card-symbol, .front-s .card-mini { color: #16a34a; }
+    .front-z .card-symbol, .front-z .card-mini { color: #dc2626; }
+    .front-j .card-symbol, .front-j .card-mini { color: #2563eb; }
+    .front-l .card-symbol, .front-l .card-mini { color: #ea580c; }
+    .front-heart .card-symbol, .front-heart .card-mini { color: var(--heart); }
+    .front-joker .card-symbol, .front-joker .card-mini { color: var(--joker); }
+
+    .revealed-banner {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      min-height: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .wrap {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .lead {
+        font-size: 13px;
+      }
+
+      .item-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .cards {
+        gap: 8px;
+      }
+
+      .toggle {
+        min-height: 42px;
+        padding: 8px 6px;
+        font-size: 12px;
+      }
+
+      .btn {
+        font-size: 13px;
+      }
+
+      .card-face {
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>テトリミノカード抽選</h1>
+    <p class="lead">
+      除外を選ばなければ9枚で抽選、除外したら残った枚数で抽選します。1枚めくった後に「答えを見る」で全カードを公開できます。
+    </p>
+
+    <div class="layout">
+      <div class="card-panel">
+        <div class="section">
+          <div class="section-title">除外するカード</div>
+          <div class="item-grid" id="excludeGrid"></div>
+          <div class="note">
+            除外は任意です。<br>
+            たとえば1枚除外なら、残り8枚でそのまま抽選します。
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">操作</div>
+          <div class="btn-row">
+            <button class="btn primary" id="startBtn">新しく抽選する</button>
+            <button class="btn" id="revealBtn" disabled>答えを見る</button>
+            <button class="btn" id="resetBtn">リセット</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">状態</div>
+          <div class="status" id="statusBox">
+            除外を選んでも選ばなくてもOKです。「新しく抽選する」を押してください。
+          </div>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="summary-box">
+          <div class="pill">使用カード数: <strong id="countPill">9</strong></div>
+          <div class="pill">除外数: <strong id="excludePill">0</strong></div>
+        </div>
+
+        <div class="cards" id="cardsGrid"></div>
+        <div class="revealed-banner" id="revealedBanner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ALL_CARDS = [
+      { id: "I", type: "tetromino", label: "Iミノ", short: "I" },
+      { id: "O", type: "tetromino", label: "Oミノ", short: "O" },
+      { id: "T", type: "tetromino", label: "Tミノ", short: "T" },
+      { id: "S", type: "tetromino", label: "Sミノ", short: "S" },
+      { id: "Z", type: "tetromino", label: "Zミノ", short: "Z" },
+      { id: "J", type: "tetromino", label: "Jミノ", short: "J" },
+      { id: "L", type: "tetromino", label: "Lミノ", short: "L" },
+      { id: "HEART_A", type: "special", label: "ハートのエース", short: "A♥" },
+      { id: "JOKER", type: "special", label: "ジョーカー", short: "JOKER" }
+    ];
+
+    const TETROMINO_SHAPES = {
+      I: [[1,1,1,1]],
+      O: [[1,1],[1,1]],
+      T: [[0,1,0],[1,1,1]],
+      S: [[0,1,1],[1,1,0]],
+      Z: [[1,1,0],[0,1,1]],
+      J: [[1,0,0],[1,1,1]],
+      L: [[0,0,1],[1,1,1]]
+    };
+
+    const excludeGrid = document.getElementById("excludeGrid");
+    const cardsGrid = document.getElementById("cardsGrid");
+    const startBtn = document.getElementById("startBtn");
+    const revealBtn = document.getElementById("revealBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const statusBox = document.getElementById("statusBox");
+    const revealedBanner = document.getElementById("revealedBanner");
+    const countPill = document.getElementById("countPill");
+    const excludePill = document.getElementById("excludePill");
+
+    const excluded = new Set();
+    let deck = [];
+    let hasPicked = false;
+    let allRevealed = false;
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function getAvailableCards() {
+      return ALL_CARDS.filter(card => !excluded.has(card.id));
+    }
+
+    function setStatus(text) {
+      statusBox.textContent = text;
+    }
+
+    function updateSummary() {
+      const available = getAvailableCards();
+      countPill.textContent = String(available.length);
+      excludePill.textContent = String(excluded.size);
+    }
+
+    function piecePreviewHtml(id) {
+      const shape = TETROMINO_SHAPES[id];
+      if (!shape) return "";
+      const rows = shape.map(row => {
+        const cells = row.map(cell =>
+          `<div class="piece-cell ${cell ? `fill ${id.toLowerCase()}` : ""}"></div>`
+        ).join("");
+        return `<div class="piece-row">${cells}</div>`;
+      }).join("");
+      return `<div class="piece-preview">${rows}</div>`;
+    }
+
+    function frontContent(card) {
+      if (card.type === "tetromino") {
+        return `
+          ${piecePreviewHtml(card.id)}
+          <div class="card-symbol">${card.short}</div>
+          <div class="card-mini">${card.label}</div>
+        `;
+      }
+
+      if (card.id === "HEART_A") {
+        return `
+          <div class="card-symbol">A♥</div>
+          <div class="card-mini">ハートのエース</div>
+          <div class="card-label">スペシャルカード</div>
+        `;
+      }
+
+      return `
+        <div class="card-symbol">🃏</div>
+        <div class="card-mini">ジョーカー</div>
+        <div class="card-label">スペシャルカード</div>
+      `;
+    }
+
+    function frontClass(card) {
+      if (card.type === "tetromino") return `front-${card.id.toLowerCase()}`;
+      if (card.id === "HEART_A") return "front-heart";
+      return "front-joker";
+    }
+
+    function renderExcludeButtons() {
+      excludeGrid.innerHTML = "";
+
+      ALL_CARDS.forEach(card => {
+        const btn = document.createElement("button");
+        btn.className = "toggle";
+        if (excluded.has(card.id)) btn.classList.add("active");
+        btn.textContent = card.label;
+
+        btn.addEventListener("click", () => {
+          if (excluded.has(card.id)) {
+            excluded.delete(card.id);
+          } else {
+            excluded.add(card.id);
+          }
+          renderExcludeButtons();
+          updateSummary();
+        });
+
+        excludeGrid.appendChild(btn);
+      });
+    }
+
+    function renderPlaceholders(count) {
+      cardsGrid.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "game-card disabled";
+        placeholder.innerHTML = `
+          <div class="card-inner">
+            <div class="card-face card-back">
+              <div class="card-back-mark">?</div>
+            </div>
+          </div>
+        `;
+        cardsGrid.appendChild(placeholder);
+      }
+    }
+
+    function renderDeck() {
+      cardsGrid.innerHTML = "";
+
+      if (!deck.length) {
+        renderPlaceholders(getAvailableCards().length);
+        return;
+      }
+
+      deck.forEach((card, index) => {
+        const cardEl = document.createElement("div");
+        cardEl.className = `game-card ${card.flipped ? "flipped" : ""} ${hasPicked && !allRevealed && !card.flipped ? "disabled" : ""}`;
+
+        cardEl.innerHTML = `
+          <div class="card-inner">
+            <div class="card-face card-back">
+              <div class="card-back-mark">?</div>
+            </div>
+            <div class="card-face card-front ${frontClass(card)}">
+              ${frontContent(card)}
+            </div>
+          </div>
+        `;
+
+        cardEl.addEventListener("click", () => {
+          if (allRevealed) return;
+          if (hasPicked) return;
+
+          deck[index].flipped = true;
+          hasPicked = true;
+          revealBtn.disabled = false;
+
+          renderDeck();
+          setStatus(`「${deck[index].label}」が出ました。「答えを見る」で全カードを公開できます。`);
+        });
+
+        cardsGrid.appendChild(cardEl);
+      });
+    }
+
+    function startNewGame() {
+      const available = getAvailableCards();
+
+      if (available.length === 0) {
+        setStatus("カードが1枚も残っていないため抽選できません。");
+        return;
+      }
+
+      deck = shuffle(available).map(card => ({ ...card, flipped: false }));
+      hasPicked = false;
+      allRevealed = false;
+      revealBtn.disabled = true;
+      revealedBanner.textContent = "";
+
+      renderDeck();
+      setStatus(`${deck.length}枚で抽選しました。裏向きのカードを1枚選んでください。`);
+    }
+
+    function revealAll() {
+      if (!deck.length) return;
+
+      deck = deck.map(card => ({ ...card, flipped: true }));
+      allRevealed = true;
+      revealBtn.disabled = true;
+
+      renderDeck();
+      revealedBanner.textContent = "全カードを公開しました。これが実際の抽選結果です。";
+      setStatus("全カードを公開しました。正しく抽選された内容を確認できます。");
+    }
+
+    function resetGame() {
+      deck = [];
+      hasPicked = false;
+      allRevealed = false;
+      revealBtn.disabled = true;
+      revealedBanner.textContent = "";
+      renderDeck();
+      setStatus("リセットしました。除外カードを調整して、もう一度抽選できます。");
+    }
+
+    startBtn.addEventListener("click", startNewGame);
+    revealBtn.addEventListener("click", revealAll);
+    resetBtn.addEventListener("click", resetGame);
+
+    renderExcludeButtons();
+    updateSummary();
+    renderPlaceholders(ALL_CARDS.length);
+  </script>
+</body>
+</html>
