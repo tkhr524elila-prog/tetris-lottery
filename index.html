@@ -2,48 +2,36 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>テトリミノカード抽選（コイン版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>テトリミノカード抽選</title>
 
 <style>
 :root {
   --bg: #f5f7fb;
   --panel: #fff;
   --line: #ddd;
-  --text: #111827;
-  --muted: #6b7280;
 
-  --i: #22d3ee;
-  --o: #facc15;
-  --t: #c084fc;
-  --s: #4ade80;
-  --z: #f87171;
-  --j: #60a5fa;
-  --l: #fb923c;
-
-  --heart: #ef4444;
-  --joker: #111827;
+  --i:#22d3ee; --o:#facc15; --t:#c084fc;
+  --s:#4ade80; --z:#f87171; --j:#60a5fa; --l:#fb923c;
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
   font-family: sans-serif;
   background: var(--bg);
-  margin: 0;
-  padding: 20px;
-  color: var(--text);
+  touch-action: manipulation;
 }
 
 .wrap {
-  max-width: 920px;
+  max-width: 900px;
   margin: auto;
-}
-
-h1 {
-  margin-bottom: 10px;
+  padding: 16px;
 }
 
 .panel {
@@ -56,217 +44,108 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 8px;
 }
 
 .toggle {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: center;
-  min-height: 84px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: #fff;
+  border:1px solid #ccc;
+  border-radius:10px;
+  padding:6px;
+  cursor:pointer;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  min-height:80px;
+  touch-action: manipulation;
 }
 
 .toggle.active {
-  background: #111;
-  color: #fff;
-}
-
-.toggle-label {
-  font-size: 12px;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-.toggle-sub {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.toggle.active .toggle-sub {
-  color: rgba(255,255,255,0.75);
+  background:#111;
+  color:#fff;
 }
 
 .cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
 }
 
 .card {
-  min-height: 140px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  background: #1e40af;
-  color: #fff;
-  cursor: pointer;
-  padding: 10px;
-  text-align: center;
+  min-height:130px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  background:#1e40af;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  text-align:center;
+  padding:6px;
+  touch-action: manipulation;
 }
 
 .card.open {
-  background: #fff;
-  color: #000;
-}
-
-.card-inner-front {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.card-title {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.card-symbol {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
+  background:#fff;
+  color:#000;
 }
 
 button {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  cursor: pointer;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  cursor:pointer;
+  touch-action: manipulation;
 }
 
 .primary {
-  background: #111;
-  color: #fff;
+  background:#111;
+  color:#fff;
 }
 
 .status {
-  margin-top: 8px;
-  font-size: 14px;
-  line-height: 1.5;
+  margin-top:8px;
+  font-size:14px;
 }
 
-.coin {
-  font-weight: bold;
-  font-size: 16px;
+/* ミニテトリミノ */
+.shape {
+  display:grid;
+  gap:2px;
 }
+.row { display:flex; gap:2px; }
+
+.cell {
+  width:10px; height:10px;
+  background:#e5e7eb;
+}
+
+.fill-i{background:var(--i)}
+.fill-o{background:var(--o)}
+.fill-t{background:var(--t)}
+.fill-s{background:var(--s)}
+.fill-z{background:var(--z)}
+.fill-j{background:var(--j)}
+.fill-l{background:var(--l)}
+
+.big { font-size:26px; font-weight:bold; }
+.small { font-size:12px; }
 
 .summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
 }
 
 .pill {
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 999px;
-  background: #f8fafc;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.pill strong {
-  color: var(--text);
-}
-
-.piece-preview {
-  display: inline-grid;
-  gap: 2px;
-  padding: 6px;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-}
-
-.piece-preview.mini {
-  padding: 4px;
-  gap: 2px;
-}
-
-.piece-row {
-  display: flex;
-  gap: 2px;
-}
-
-.piece-cell {
-  width: 14px;
-  height: 14px;
-  border-radius: 2px;
-  background: #e5e7eb;
-  border: 1px solid #d1d5db;
-}
-
-.piece-preview.mini .piece-cell {
-  width: 10px;
-  height: 10px;
-}
-
-.piece-cell.fill.i { background: var(--i); border-color: var(--i); }
-.piece-cell.fill.o { background: var(--o); border-color: var(--o); }
-.piece-cell.fill.t { background: var(--t); border-color: var(--t); }
-.piece-cell.fill.s { background: var(--s); border-color: var(--s); }
-.piece-cell.fill.z { background: var(--z); border-color: var(--z); }
-.piece-cell.fill.j { background: var(--j); border-color: var(--j); }
-.piece-cell.fill.l { background: var(--l); border-color: var(--l); }
-
-.icon-heart {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--heart);
-  line-height: 1;
-}
-
-.icon-joker {
-  font-size: 22px;
-  color: var(--joker);
-  line-height: 1;
-}
-
-.front-i .card-symbol, .front-i .card-title { color: var(--i); }
-.front-o .card-symbol, .front-o .card-title { color: #b45309; }
-.front-t .card-symbol, .front-t .card-title { color: #7c3aed; }
-.front-s .card-symbol, .front-s .card-title { color: #16a34a; }
-.front-z .card-symbol, .front-z .card-title { color: #dc2626; }
-.front-j .card-symbol, .front-j .card-title { color: #2563eb; }
-.front-l .card-symbol, .front-l .card-title { color: #ea580c; }
-.front-heart .card-symbol, .front-heart .card-title { color: var(--heart); }
-.front-joker .card-symbol, .front-joker .card-title { color: var(--joker); }
-
-@media (max-width: 640px) {
-  body {
-    padding: 12px;
-  }
-
-  .cards {
-    gap: 8px;
-  }
-
-  .card {
-    min-height: 120px;
-  }
-
-  .toggle {
-    min-height: 78px;
-    padding: 6px;
-  }
-
-  .toggle-label {
-    font-size: 11px;
-  }
+  font-size:12px;
+  background:#f3f4f6;
+  padding:4px 8px;
+  border-radius:999px;
 }
 </style>
 </head>
@@ -274,30 +153,30 @@ button {
 <body>
 <div class="wrap">
 
-<h1>テトリミノカード抽選</h1>
+<h2>テトリミノカード抽選</h2>
 
 <div class="panel">
-  <div>コイン：<span class="coin" id="coin">0</span></div>
-  <button id="eatBtn">🍽 完食（+1コイン）</button>
+  コイン：<b id="coin">0</b>
+  <button id="eatBtn">🍽 完食</button>
 </div>
 
 <div class="panel">
-  <div>除外カード（選択時はまだコスト消費しない）</div>
+  除外カード
   <div class="grid" id="excludeGrid"></div>
 </div>
 
 <div class="panel">
   <button class="primary" id="drawBtn">カードを並べる</button>
-  <button id="revealBtn" disabled>答えを全て見る</button>
+  <button id="revealBtn" disabled>答えを見る</button>
   <button id="resetBtn">リセット</button>
 
   <div class="summary">
-    <div class="pill">除外数: <strong id="excludeCount">0</strong></div>
-    <div class="pill">使用カード数: <strong id="availableCount">9</strong></div>
-    <div class="pill">今回の必要コイン: <strong id="costInfo">1</strong></div>
+    <div class="pill">除外: <span id="exCnt">0</span></div>
+    <div class="pill">枚数: <span id="cardCnt">9</span></div>
+    <div class="pill">消費: <span id="cost">1</span></div>
   </div>
 
-  <div class="status" id="status">①完食でコイン追加 → ②除外選択 → ③カードを並べる → ④タップで開く</div>
+  <div class="status" id="status"></div>
 </div>
 
 <div class="panel">
@@ -307,261 +186,154 @@ button {
 </div>
 
 <script>
-const ALL = [
-  { id: "I", label: "Iミノ", kind: "tetro" },
-  { id: "O", label: "Oミノ", kind: "tetro" },
-  { id: "T", label: "Tミノ", kind: "tetro" },
-  { id: "S", label: "Sミノ", kind: "tetro" },
-  { id: "Z", label: "Zミノ", kind: "tetro" },
-  { id: "J", label: "Jミノ", kind: "tetro" },
-  { id: "L", label: "Lミノ", kind: "tetro" },
-  { id: "A♥", label: "ハートのエース", kind: "heart" },
-  { id: "JOKER", label: "ジョーカー", kind: "joker" }
+const DATA = [
+  {id:"I"}, {id:"O"}, {id:"T"},
+  {id:"S"}, {id:"Z"}, {id:"J"}, {id:"L"},
+  {id:"A♥"}, {id:"🃏"}
 ];
 
 const SHAPES = {
-  I: [[1,1,1,1]],
-  O: [[1,1],[1,1]],
-  T: [[0,1,0],[1,1,1]],
-  S: [[0,1,1],[1,1,0]],
-  Z: [[1,1,0],[0,1,1]],
-  J: [[1,0,0],[1,1,1]],
-  L: [[0,0,1],[1,1,1]]
+  I:[[1,1,1,1]],
+  O:[[1,1],[1,1]],
+  T:[[0,1,0],[1,1,1]],
+  S:[[0,1,1],[1,1,0]],
+  Z:[[1,1,0],[0,1,1]],
+  J:[[1,0,0],[1,1,1]],
+  L:[[0,0,1],[1,1,1]]
 };
 
-let coin = 0;
-let excluded = new Set();
-let deck = [];
-let opened = false;
-let deckPrepared = false;
+let coin=0;
+let excluded=new Set();
+let deck=[];
+let opened=false;
+let prepared=false;
 
-// UI
-const coinEl = document.getElementById("coin");
-const excludeGrid = document.getElementById("excludeGrid");
-const cardsEl = document.getElementById("cards");
-const statusEl = document.getElementById("status");
-const costInfoEl = document.getElementById("costInfo");
-const excludeCountEl = document.getElementById("excludeCount");
-const availableCountEl = document.getElementById("availableCount");
+const coinEl = coinSpan = document.getElementById("coin");
+const grid = document.getElementById("excludeGrid");
+const cards = document.getElementById("cards");
+const status = document.getElementById("status");
+const costEl = document.getElementById("cost");
+const exCnt = document.getElementById("exCnt");
+const cardCnt = document.getElementById("cardCnt");
 const revealBtn = document.getElementById("revealBtn");
 
-// -------- アイコン系 --------
-function piecePreviewHtml(id, mini = false) {
-  const shape = SHAPES[id];
-  if (!shape) return "";
+function cost(){ return 1 + excluded.size; }
 
-  const rows = shape.map(row => {
-    const cells = row.map(cell =>
-      `<div class="piece-cell ${cell ? `fill ${id.toLowerCase()}` : ""}"></div>`
-    ).join("");
-    return `<div class="piece-row">${cells}</div>`;
-  }).join("");
-
-  return `<div class="piece-preview ${mini ? "mini" : ""}">${rows}</div>`;
-}
-
-function iconHtml(card, mini = false) {
-  if (card.kind === "tetro") {
-    return piecePreviewHtml(card.id, mini);
-  }
-  if (card.kind === "heart") {
-    return `<div class="icon-heart">A♥</div>`;
-  }
-  return `<div class="icon-joker">🃏</div>`;
-}
-
-function frontHtml(card) {
-  if (card.kind === "tetro") {
-    return `
-      <div class="card-inner-front front-${card.id.toLowerCase()}">
-        ${piecePreviewHtml(card.id)}
-        <div class="card-symbol">${card.id}</div>
-        <div class="card-title">${card.label}</div>
-      </div>
-    `;
-  }
-
-  if (card.kind === "heart") {
-    return `
-      <div class="card-inner-front front-heart">
-        <div class="card-symbol">A♥</div>
-        <div class="card-title">${card.label}</div>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="card-inner-front front-joker">
-      <div class="card-symbol">🃏</div>
-      <div class="card-title">${card.label}</div>
-    </div>
-  `;
-}
-
-// -------- コイン --------
-document.getElementById("eatBtn").onclick = () => {
-  coin++;
-  updateCoin();
-  updateCostInfo();
-  statusEl.textContent = `完食で1コイン追加しました。現在 ${coin} コインです。`;
-};
-
-function updateCoin() {
+function updateUI(){
   coinEl.textContent = coin;
+  costEl.textContent = cost();
+  exCnt.textContent = excluded.size;
+  cardCnt.textContent = DATA.length - excluded.size;
 }
 
-function getCost() {
-  return 1 + excluded.size;
+function shapeHTML(id){
+  if(!SHAPES[id]) return "";
+  return `<div class="shape">` +
+    SHAPES[id].map(r =>
+      `<div class="row">` +
+      r.map(c=>`<div class="cell ${c?`fill-${id.toLowerCase()}`:""}"></div>`).join("") +
+      `</div>`
+    ).join("") +
+  `</div>`;
 }
 
-function updateCostInfo() {
-  costInfoEl.textContent = getCost();
-  excludeCountEl.textContent = excluded.size;
-  availableCountEl.textContent = ALL.length - excluded.size;
+function iconHTML(id){
+  if(SHAPES[id]) return shapeHTML(id);
+  return `<div class="big">${id}</div>`;
 }
 
-// -------- 除外UI --------
-function renderExclude() {
-  excludeGrid.innerHTML = "";
+function renderExclude(){
+  grid.innerHTML="";
+  DATA.forEach(d=>{
+    const el=document.createElement("div");
+    el.className="toggle"+(excluded.has(d.id)?" active":"");
 
-  ALL.forEach(card => {
-    const btn = document.createElement("div");
-    btn.className = "toggle";
-    if (excluded.has(card.id)) btn.classList.add("active");
+    el.innerHTML = iconHTML(d.id) + `<div class="small">${d.id}</div>`;
 
-    btn.innerHTML = `
-      ${iconHtml(card, true)}
-      <div class="toggle-label">${card.label}</div>
-      <div class="toggle-sub">${excluded.has(card.id) ? "除外中" : "抽選対象"}</div>
-    `;
-
-    btn.onclick = () => {
-      if (deckPrepared && !opened) {
-        statusEl.textContent = "カード準備後は除外を変更できません。リセットしてください。";
-        return;
-      }
-      if (opened) {
-        statusEl.textContent = "結果表示後は除外を変更できません。リセットしてください。";
-        return;
-      }
-
-      if (excluded.has(card.id)) {
-        excluded.delete(card.id);
-      } else {
-        excluded.add(card.id);
-      }
-
-      renderExclude();
-      updateCostInfo();
+    el.onclick=()=>{
+      if(prepared) return;
+      excluded.has(d.id)?excluded.delete(d.id):excluded.add(d.id);
+      renderExclude(); updateUI();
     };
 
-    excludeGrid.appendChild(btn);
+    grid.appendChild(el);
   });
 }
 
-// -------- カード --------
-function renderCards() {
-  cardsEl.innerHTML = "";
+function renderCards(){
+  cards.innerHTML="";
+  deck.forEach(d=>{
+    const el=document.createElement("div");
+    el.className="card"+(d.open?" open":"");
 
-  deck.forEach((c) => {
-    const el = document.createElement("div");
-    el.className = "card";
-    if (c.open) el.classList.add("open");
+    el.innerHTML = d.open
+      ? iconHTML(d.value) + `<div>${d.value}</div>`
+      : "?";
 
-    if (c.open) {
-      el.innerHTML = frontHtml(c.card);
-    } else {
-      el.textContent = "?";
-    }
+    el.onclick=()=>{
+      if(!prepared || opened) return;
 
-    el.onclick = () => {
-      if (!deckPrepared) {
-        statusEl.textContent = "先に「カードを並べる」を押してください。";
+      if(coin < cost()){
+        status.textContent="コイン不足";
         return;
       }
 
-      if (opened) return;
+      coin -= cost();
+      updateUI();
 
-      const cost = getCost();
-
-      if (coin < cost) {
-        statusEl.textContent = `コイン不足（必要 ${cost}）`;
-        return;
-      }
-
-      coin -= cost;
-      updateCoin();
-
-      c.open = true;
-      opened = true;
-      revealBtn.disabled = false;
+      d.open=true;
+      opened=true;
+      revealBtn.disabled=false;
       renderCards();
 
-      statusEl.textContent = `結果：${c.card.label}（コスト ${cost} 消費）`;
+      status.textContent="結果："+d.value;
     };
 
-    cardsEl.appendChild(el);
+    cards.appendChild(el);
   });
 }
 
-// -------- 抽選準備 --------
-document.getElementById("drawBtn").onclick = () => {
-  const available = ALL.filter(x => !excluded.has(x.id));
-
-  if (available.length === 0) {
-    statusEl.textContent = "カードがありません";
-    return;
-  }
-
-  deck = shuffle(available).map(v => ({
-    card: v,
-    open: false
-  }));
-
-  opened = false;
-  deckPrepared = true;
-  revealBtn.disabled = true;
-  renderCards();
-
-  statusEl.textContent = `カードを並べました。1枚選ぶと ${getCost()} コイン消費します。`;
+document.getElementById("eatBtn").onclick=()=>{
+  coin++; updateUI();
 };
 
-// -------- 全公開 --------
-document.getElementById("revealBtn").onclick = () => {
-  if (!deckPrepared || !opened) {
-    statusEl.textContent = "先に1枚カードを開いてください。";
-    return;
-  }
-
-  deck.forEach(c => c.open = true);
+document.getElementById("drawBtn").onclick=()=>{
+  const avail = DATA.filter(d=>!excluded.has(d.id));
+  deck = shuffle(avail).map(d=>({value:d.id,open:false}));
+  prepared=true; opened=false;
+  revealBtn.disabled=true;
   renderCards();
-  revealBtn.disabled = true;
-  statusEl.textContent = "全ての答えを表示しました。";
+  status.textContent="カードを選択";
 };
 
-// -------- リセット --------
-document.getElementById("resetBtn").onclick = () => {
+document.getElementById("revealBtn").onclick=()=>{
+  deck.forEach(d=>d.open=true);
+  renderCards();
+};
+
+document.getElementById("resetBtn").onclick=()=>{
   excluded.clear();
-  deck = [];
-  opened = false;
-  deckPrepared = false;
-  renderExclude();
-  renderCards();
-  updateCostInfo();
-  revealBtn.disabled = true;
-  statusEl.textContent = "リセットしました（コインは維持）";
+  deck=[]; prepared=false; opened=false;
+  renderExclude(); renderCards(); updateUI();
 };
 
-// -------- util --------
-function shuffle(a) {
-  return [...a].sort(() => Math.random() - 0.5);
+function shuffle(a){
+  return [...a].sort(()=>Math.random()-0.5);
 }
 
-// 初期
+/* 🔥 ダブルタップズーム防止 */
+let lastTouch = 0;
+document.addEventListener('touchend', function(e){
+  const now = new Date().getTime();
+  if(now - lastTouch <= 300){
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, false);
+
 renderExclude();
-renderCards();
-updateCoin();
-updateCostInfo();
+updateUI();
 </script>
+
 </body>
 </html>
