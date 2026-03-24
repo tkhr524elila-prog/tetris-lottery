@@ -1,339 +1,708 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-<title>テトリミノカード抽選</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <title>テトリミノカード抽選</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d9dfeb;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #111827;
+      --primary-text: #ffffff;
 
-<style>
-:root {
-  --bg: #f5f7fb;
-  --panel: #fff;
-  --line: #ddd;
+      --i: #22d3ee;
+      --o: #facc15;
+      --t: #c084fc;
+      --s: #4ade80;
+      --z: #f87171;
+      --j: #60a5fa;
+      --l: #fb923c;
 
-  --i:#22d3ee; --o:#facc15; --t:#c084fc;
-  --s:#4ade80; --z:#f87171; --j:#60a5fa; --l:#fb923c;
-}
+      --heart: #ef4444;
+      --joker: #111827;
+    }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  background: var(--bg);
-  touch-action: manipulation;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      touch-action: manipulation;
+    }
 
-.wrap {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
-}
+    body {
+      min-height: 100vh;
+    }
 
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px;
+    }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-}
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
 
-.toggle {
-  border:1px solid #ccc;
-  border-radius:10px;
-  padding:6px;
-  cursor:pointer;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  min-height:80px;
-  touch-action: manipulation;
-}
+    .lead {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-.toggle.active {
-  background:#111;
-  color:#fff;
-}
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
 
-.cards {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
 
-.card {
-  min-height:130px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  background:#1e40af;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  text-align:center;
-  padding:6px;
-  touch-action: manipulation;
-}
+    .panel-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
 
-.card.open {
-  background:#fff;
-  color:#000;
-}
+    .coin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-button {
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  cursor:pointer;
-  touch-action: manipulation;
-}
+    .coin-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-.primary {
-  background:#111;
-  color:#fff;
-}
+    .coin-badge {
+      min-width: 44px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      border: 1px solid var(--line);
+    }
 
-.status {
-  margin-top:8px;
-  font-size:14px;
-}
+    .button {
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
 
-/* ミニテトリミノ */
-.shape {
-  display:grid;
-  gap:2px;
-}
-.row { display:flex; gap:2px; }
+    .button.primary {
+      background: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+    }
 
-.cell {
-  width:10px; height:10px;
-  background:#e5e7eb;
-}
+    .button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
 
-.fill-i{background:var(--i)}
-.fill-o{background:var(--o)}
-.fill-t{background:var(--t)}
-.fill-s{background:var(--s)}
-.fill-z{background:var(--z)}
-.fill-j{background:var(--j)}
-.fill-l{background:var(--l)}
+    .exclude-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
 
-.big { font-size:26px; font-weight:bold; }
-.small { font-size:12px; }
+    .exclude-card {
+      min-height: 88px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.15s ease;
+      touch-action: manipulation;
+    }
 
-.summary {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+    .exclude-card.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
 
-.pill {
-  font-size:12px;
-  background:#f3f4f6;
-  padding:4px 8px;
-  border-radius:999px;
-}
-</style>
+    .exclude-name {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .exclude-sub {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+
+    .exclude-card.active .exclude-sub {
+      color: rgba(255,255,255,0.75);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .pill-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .pill-value {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .status-box {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .status-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .status-text {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.4;
+      min-height: 24px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .card {
+      min-height: 132px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .card.open {
+      background: #fff;
+      color: #000;
+    }
+
+    .card-face {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .card-symbol {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .piece-preview {
+      display: inline-grid;
+      gap: 2px;
+      padding: 6px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+    }
+
+    .piece-preview.mini {
+      padding: 4px;
+      gap: 2px;
+    }
+
+    .piece-row {
+      display: flex;
+      gap: 2px;
+    }
+
+    .piece-cell {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      background: #e5e7eb;
+      border: 1px solid #d1d5db;
+    }
+
+    .piece-preview.mini .piece-cell {
+      width: 10px;
+      height: 10px;
+    }
+
+    .fill-i { background: var(--i); border-color: var(--i); }
+    .fill-o { background: var(--o); border-color: var(--o); }
+    .fill-t { background: var(--t); border-color: var(--t); }
+    .fill-s { background: var(--s); border-color: var(--s); }
+    .fill-z { background: var(--z); border-color: var(--z); }
+    .fill-j { background: var(--j); border-color: var(--j); }
+    .fill-l { background: var(--l); border-color: var(--l); }
+
+    .icon-heart {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--heart);
+    }
+
+    .icon-joker {
+      font-size: 24px;
+      line-height: 1;
+      color: var(--joker);
+    }
+
+    .front-i .card-symbol, .front-i .card-title { color: var(--i); }
+    .front-o .card-symbol, .front-o .card-title { color: #b45309; }
+    .front-t .card-symbol, .front-t .card-title { color: #7c3aed; }
+    .front-s .card-symbol, .front-s .card-title { color: #16a34a; }
+    .front-z .card-symbol, .front-z .card-title { color: #dc2626; }
+    .front-j .card-symbol, .front-j .card-title { color: #2563eb; }
+    .front-l .card-symbol, .front-l .card-title { color: #ea580c; }
+    .front-heart .card-symbol, .front-heart .card-title { color: var(--heart); }
+    .front-joker .card-symbol, .front-joker .card-title { color: var(--joker); }
+
+    @media (min-width: 720px) {
+      .action-grid {
+        grid-template-columns: 1.2fr 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .lead {
+        font-size: 12px;
+      }
+
+      .card {
+        min-height: 116px;
+      }
+
+      .cards-grid {
+        gap: 8px;
+      }
+
+      .exclude-card {
+        min-height: 82px;
+      }
+
+      .summary {
+        gap: 6px;
+      }
+
+      .pill {
+        padding: 8px 6px;
+      }
+
+      .pill-value {
+        font-size: 14px;
+      }
+
+      .button {
+        min-height: 46px;
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-<div class="wrap">
+  <div class="wrap">
+    <h1>テトリミノカード抽選</h1>
+    <p class="lead">
+      完食でコインを貯めて、除外を選び、カードを並べてから1枚開きます。
+    </p>
 
-<h2>テトリミノカード抽選</h2>
+    <div class="stack">
+      <div class="panel">
+        <div class="coin-row">
+          <div class="coin-box">
+            <span>コイン</span>
+            <span class="coin-badge" id="coin">0</span>
+          </div>
+          <button class="button primary" id="eatBtn">🍽 完食（+1）</button>
+        </div>
+      </div>
 
-<div class="panel">
-  コイン：<b id="coin">0</b>
-  <button id="eatBtn">🍽 完食</button>
-</div>
+      <div class="panel">
+        <div class="panel-title">除外カード</div>
+        <div class="exclude-grid" id="excludeGrid"></div>
+      </div>
 
-<div class="panel">
-  除外カード
-  <div class="grid" id="excludeGrid"></div>
-</div>
+      <div class="panel">
+        <div class="summary">
+          <div class="pill">
+            <div class="pill-label">除外</div>
+            <div class="pill-value" id="excludeCount">0</div>
+          </div>
+          <div class="pill">
+            <div class="pill-label">枚数</div>
+            <div class="pill-value" id="availableCount">9</div>
+          </div>
+          <div class="pill">
+            <div class="pill-label">消費</div>
+            <div class="pill-value" id="costInfo">1</div>
+          </div>
+        </div>
 
-<div class="panel">
-  <button class="primary" id="drawBtn">カードを並べる</button>
-  <button id="revealBtn" disabled>答えを見る</button>
-  <button id="resetBtn">リセット</button>
+        <div style="height:10px;"></div>
 
-  <div class="summary">
-    <div class="pill">除外: <span id="exCnt">0</span></div>
-    <div class="pill">枚数: <span id="cardCnt">9</span></div>
-    <div class="pill">消費: <span id="cost">1</span></div>
+        <div class="action-grid">
+          <button class="button primary" id="drawBtn">カードを並べる</button>
+          <button class="button" id="revealBtn" disabled>答えを見る</button>
+          <button class="button" id="resetBtn">リセット</button>
+        </div>
+
+        <div class="status-box">
+          <div class="status-title">状態</div>
+          <div class="status-text" id="status">①完食 → ②除外 → ③カードを並べる → ④1枚タップ</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="cards-grid" id="cards"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="status" id="status"></div>
-</div>
+  <script>
+    const ALL = [
+      { id: "I", label: "I", full: "Iミノ", kind: "tetro" },
+      { id: "O", label: "O", full: "Oミノ", kind: "tetro" },
+      { id: "T", label: "T", full: "Tミノ", kind: "tetro" },
+      { id: "S", label: "S", full: "Sミノ", kind: "tetro" },
+      { id: "Z", label: "Z", full: "Zミノ", kind: "tetro" },
+      { id: "J", label: "J", full: "Jミノ", kind: "tetro" },
+      { id: "L", label: "L", full: "Lミノ", kind: "tetro" },
+      { id: "A♥", label: "A♥", full: "ハートのエース", kind: "heart" },
+      { id: "JOKER", label: "🃏", full: "ジョーカー", kind: "joker" }
+    ];
 
-<div class="panel">
-  <div class="cards" id="cards"></div>
-</div>
-
-</div>
-
-<script>
-const DATA = [
-  {id:"I"}, {id:"O"}, {id:"T"},
-  {id:"S"}, {id:"Z"}, {id:"J"}, {id:"L"},
-  {id:"A♥"}, {id:"🃏"}
-];
-
-const SHAPES = {
-  I:[[1,1,1,1]],
-  O:[[1,1],[1,1]],
-  T:[[0,1,0],[1,1,1]],
-  S:[[0,1,1],[1,1,0]],
-  Z:[[1,1,0],[0,1,1]],
-  J:[[1,0,0],[1,1,1]],
-  L:[[0,0,1],[1,1,1]]
-};
-
-let coin=0;
-let excluded=new Set();
-let deck=[];
-let opened=false;
-let prepared=false;
-
-const coinEl = coinSpan = document.getElementById("coin");
-const grid = document.getElementById("excludeGrid");
-const cards = document.getElementById("cards");
-const status = document.getElementById("status");
-const costEl = document.getElementById("cost");
-const exCnt = document.getElementById("exCnt");
-const cardCnt = document.getElementById("cardCnt");
-const revealBtn = document.getElementById("revealBtn");
-
-function cost(){ return 1 + excluded.size; }
-
-function updateUI(){
-  coinEl.textContent = coin;
-  costEl.textContent = cost();
-  exCnt.textContent = excluded.size;
-  cardCnt.textContent = DATA.length - excluded.size;
-}
-
-function shapeHTML(id){
-  if(!SHAPES[id]) return "";
-  return `<div class="shape">` +
-    SHAPES[id].map(r =>
-      `<div class="row">` +
-      r.map(c=>`<div class="cell ${c?`fill-${id.toLowerCase()}`:""}"></div>`).join("") +
-      `</div>`
-    ).join("") +
-  `</div>`;
-}
-
-function iconHTML(id){
-  if(SHAPES[id]) return shapeHTML(id);
-  return `<div class="big">${id}</div>`;
-}
-
-function renderExclude(){
-  grid.innerHTML="";
-  DATA.forEach(d=>{
-    const el=document.createElement("div");
-    el.className="toggle"+(excluded.has(d.id)?" active":"");
-
-    el.innerHTML = iconHTML(d.id) + `<div class="small">${d.id}</div>`;
-
-    el.onclick=()=>{
-      if(prepared) return;
-      excluded.has(d.id)?excluded.delete(d.id):excluded.add(d.id);
-      renderExclude(); updateUI();
+    const SHAPES = {
+      I: [[1,1,1,1]],
+      O: [[1,1],[1,1]],
+      T: [[0,1,0],[1,1,1]],
+      S: [[0,1,1],[1,1,0]],
+      Z: [[1,1,0],[0,1,1]],
+      J: [[1,0,0],[1,1,1]],
+      L: [[0,0,1],[1,1,1]]
     };
 
-    grid.appendChild(el);
-  });
-}
+    let coin = 0;
+    let excluded = new Set();
+    let deck = [];
+    let opened = false;
+    let deckPrepared = false;
 
-function renderCards(){
-  cards.innerHTML="";
-  deck.forEach(d=>{
-    const el=document.createElement("div");
-    el.className="card"+(d.open?" open":"");
+    const coinEl = document.getElementById("coin");
+    const excludeGrid = document.getElementById("excludeGrid");
+    const cardsEl = document.getElementById("cards");
+    const statusEl = document.getElementById("status");
+    const costInfoEl = document.getElementById("costInfo");
+    const excludeCountEl = document.getElementById("excludeCount");
+    const availableCountEl = document.getElementById("availableCount");
+    const revealBtn = document.getElementById("revealBtn");
 
-    el.innerHTML = d.open
-      ? iconHTML(d.value) + `<div>${d.value}</div>`
-      : "?";
+    function piecePreviewHtml(id, mini = false) {
+      const shape = SHAPES[id];
+      if (!shape) return "";
 
-    el.onclick=()=>{
-      if(!prepared || opened) return;
+      const rows = shape.map(row => {
+        const cells = row.map(cell =>
+          `<div class="piece-cell ${cell ? `fill-${id.toLowerCase()}` : ""}"></div>`
+        ).join("");
+        return `<div class="piece-row">${cells}</div>`;
+      }).join("");
 
-      if(coin < cost()){
-        status.textContent="コイン不足";
+      return `<div class="piece-preview ${mini ? "mini" : ""}">${rows}</div>`;
+    }
+
+    function iconHtml(card, mini = false) {
+      if (card.kind === "tetro") return piecePreviewHtml(card.id, mini);
+      if (card.kind === "heart") return `<div class="icon-heart">A♥</div>`;
+      return `<div class="icon-joker">🃏</div>`;
+    }
+
+    function frontHtml(card) {
+      if (card.kind === "tetro") {
+        return `
+          <div class="card-face front-${card.id.toLowerCase()}">
+            ${piecePreviewHtml(card.id)}
+            <div class="card-symbol">${card.label}</div>
+            <div class="card-title">${card.full}</div>
+          </div>
+        `;
+      }
+
+      if (card.kind === "heart") {
+        return `
+          <div class="card-face front-heart">
+            <div class="card-symbol">A♥</div>
+            <div class="card-title">${card.full}</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="card-face front-joker">
+          <div class="card-symbol">🃏</div>
+          <div class="card-title">${card.full}</div>
+        </div>
+      `;
+    }
+
+    function getCost() {
+      return 1 + excluded.size;
+    }
+
+    function updateCoin() {
+      coinEl.textContent = coin;
+    }
+
+    function updateCostInfo() {
+      costInfoEl.textContent = getCost();
+      excludeCountEl.textContent = excluded.size;
+      availableCountEl.textContent = ALL.length - excluded.size;
+    }
+
+    function renderExclude() {
+      excludeGrid.innerHTML = "";
+
+      ALL.forEach(card => {
+        const btn = document.createElement("div");
+        btn.className = "exclude-card" + (excluded.has(card.id) ? " active" : "");
+
+        btn.innerHTML = `
+          ${iconHtml(card, true)}
+          <div class="exclude-name">${card.full}</div>
+          <div class="exclude-sub">${excluded.has(card.id) ? "除外中" : "抽選対象"}</div>
+        `;
+
+        btn.onclick = () => {
+          if (deckPrepared && !opened) {
+            statusEl.textContent = "カード準備後は除外を変更できません。リセットしてください。";
+            return;
+          }
+          if (opened) {
+            statusEl.textContent = "結果表示後は除外を変更できません。リセットしてください。";
+            return;
+          }
+
+          if (excluded.has(card.id)) {
+            excluded.delete(card.id);
+          } else {
+            excluded.add(card.id);
+          }
+
+          renderExclude();
+          updateCostInfo();
+        };
+
+        excludeGrid.appendChild(btn);
+      });
+    }
+
+    function renderCards() {
+      cardsEl.innerHTML = "";
+
+      deck.forEach((item) => {
+        const el = document.createElement("div");
+        el.className = "card" + (item.open ? " open" : "");
+
+        if (item.open) {
+          el.innerHTML = frontHtml(item.card);
+        } else {
+          el.textContent = "?";
+        }
+
+        el.onclick = () => {
+          if (!deckPrepared) {
+            statusEl.textContent = "先に「カードを並べる」を押してください。";
+            return;
+          }
+
+          if (opened) return;
+
+          const cost = getCost();
+
+          if (coin < cost) {
+            statusEl.textContent = `コイン不足（必要 ${cost}）`;
+            return;
+          }
+
+          coin -= cost;
+          updateCoin();
+
+          item.open = true;
+          opened = true;
+          revealBtn.disabled = false;
+          renderCards();
+
+          statusEl.textContent = `結果：${item.card.full}（コスト ${cost} 消費）`;
+        };
+
+        cardsEl.appendChild(el);
+      });
+    }
+
+    document.getElementById("eatBtn").onclick = () => {
+      coin++;
+      updateCoin();
+      updateCostInfo();
+      statusEl.textContent = `完食で1コイン追加しました。現在 ${coin} コインです。`;
+    };
+
+    document.getElementById("drawBtn").onclick = () => {
+      const available = ALL.filter(x => !excluded.has(x.id));
+
+      if (available.length === 0) {
+        statusEl.textContent = "カードがありません。";
         return;
       }
 
-      coin -= cost();
-      updateUI();
+      deck = shuffle(available).map(card => ({
+        card,
+        open: false
+      }));
 
-      d.open=true;
-      opened=true;
-      revealBtn.disabled=false;
+      opened = false;
+      deckPrepared = true;
+      revealBtn.disabled = true;
       renderCards();
 
-      status.textContent="結果："+d.value;
+      statusEl.textContent = `カードを並べました。1枚選ぶと ${getCost()} コイン消費します。`;
     };
 
-    cards.appendChild(el);
-  });
-}
+    document.getElementById("revealBtn").onclick = () => {
+      if (!deckPrepared || !opened) {
+        statusEl.textContent = "先に1枚カードを開いてください。";
+        return;
+      }
 
-document.getElementById("eatBtn").onclick=()=>{
-  coin++; updateUI();
-};
+      deck.forEach(item => item.open = true);
+      renderCards();
+      revealBtn.disabled = true;
+      statusEl.textContent = "全ての答えを表示しました。";
+    };
 
-document.getElementById("drawBtn").onclick=()=>{
-  const avail = DATA.filter(d=>!excluded.has(d.id));
-  deck = shuffle(avail).map(d=>({value:d.id,open:false}));
-  prepared=true; opened=false;
-  revealBtn.disabled=true;
-  renderCards();
-  status.textContent="カードを選択";
-};
+    document.getElementById("resetBtn").onclick = () => {
+      excluded.clear();
+      deck = [];
+      opened = false;
+      deckPrepared = false;
+      revealBtn.disabled = true;
 
-document.getElementById("revealBtn").onclick=()=>{
-  deck.forEach(d=>d.open=true);
-  renderCards();
-};
+      renderExclude();
+      renderCards();
+      updateCostInfo();
 
-document.getElementById("resetBtn").onclick=()=>{
-  excluded.clear();
-  deck=[]; prepared=false; opened=false;
-  renderExclude(); renderCards(); updateUI();
-};
+      statusEl.textContent = "リセットしました（コインは維持）";
+    };
 
-function shuffle(a){
-  return [...a].sort(()=>Math.random()-0.5);
-}
+    function shuffle(a) {
+      return [...a].sort(() => Math.random() - 0.5);
+    }
 
-/* 🔥 ダブルタップズーム防止 */
-let lastTouch = 0;
-document.addEventListener('touchend', function(e){
-  const now = new Date().getTime();
-  if(now - lastTouch <= 300){
-    e.preventDefault();
-  }
-  lastTouch = now;
-}, false);
+    let lastTouchEnd = 0;
+    document.addEventListener("touchend", function(e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
 
-renderExclude();
-updateUI();
-</script>
-
+    renderExclude();
+    renderCards();
+    updateCoin();
+    updateCostInfo();
+  </script>
 </body>
 </html>
